@@ -29,8 +29,7 @@ main {
   max-width: 26em;
 }
 
-main.please-wait {
-}
+main.please-wait {}
 
 h1 {
   background-image: url(./logo-black.svg);
@@ -122,6 +121,7 @@ button, input {
   font: inherit;
   outline: none;
 }
+
 main.please-wait .change button {
   position: relative;
   pointer-events: none;
@@ -130,6 +130,7 @@ main.please-wait .change button {
 main.please-wait .change button span {
   visibility: hidden;
 }
+
 button {
   background-color: var(--secondary);
   border-radius: 5px;
@@ -142,6 +143,7 @@ button {
 button:hover, button:focus {
   box-shadow: 0 0 10em rgba(255, 255, 255, 0.2) inset;
 }
+
 input {
   background-color: var(--light-gray);
   border: none;

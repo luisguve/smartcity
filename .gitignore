@@ -17,6 +17,10 @@ node_modules
 
 # production
 /build
+frontend/.parcel-cache
+frontend/dist
+contract/neardev
+contract/build
 
 # misc
 .DS_Store
