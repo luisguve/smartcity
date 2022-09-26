@@ -7,7 +7,6 @@ import {
   LookupMap,
   assert
 } from "near-sdk-js";
-import { ONE_NEAR } from "./model"
 
 /*
 suponiendo que hay un maximo de 5 horas de sol pico al dia y que este valor
@@ -22,6 +21,8 @@ granja 3 (250 NEAR): 210 paneles de 400W -> 420kwh al dia
 para recuperar la inversion en 3 a#os,
 el valor de cada token sera de 0.0006 $NEAR
 */
+
+const ONE_NEAR: bigint = BigInt('1000000000000000000000000');
 
 // Valor de tokens de KWh equivalente en NEAR
 const NEAR_KWH_RATE = BigInt('600000000000000000000');
@@ -63,6 +64,7 @@ interface SolarFarmParams {
   initialFarm: Farm
 }
 
+@NearBindgen({})
 class EnergyGeneratorAccount {
   accountId: string;
 
@@ -97,17 +99,14 @@ class EnergyGeneratorAccount {
 @NearBindgen({})
 class FungibleToken {
 
-  accounts = new LookupMap("");
-  totalSupply: string;
+  accounts = new LookupMap("tokens");
+  totalSupply = "200000000";
 
   energyGenerators = new LookupMap("energy_generators");
 
   @initialize({})
-  init({ prefix, totalSupply }: { prefix: string, totalSupply: string }): void {
-    this.accounts = new LookupMap(prefix);
-    this.totalSupply = totalSupply;
+  init (): void {
     this.accounts.set(near.currentAccountId(), this.totalSupply);
-    // In a real world Fungible Token contract, storage management is required to denfense drain-storage attack
   }
 
   internalDeposit({ accountId, amount }: { accountId: string, amount: string }): void {
@@ -179,7 +178,7 @@ class FungibleToken {
 
     const farmPrice = farmNamesPricesMapping[farmSize];
 
-    assert(farmPrice == attachedDeposit, `Attached deposit ${attachedDeposit} does not match farm price ${farmPrice}. Prepaid gas: ${near.prepaidGas()}`)
+    assert(attachedDeposit >= farmPrice, `Attached deposit ${attachedDeposit} is not greater than or equal to farm price ${farmPrice}.`)
 
     const newFarm: Farm = FARMS[farmSize]
 
@@ -242,10 +241,3 @@ class FungibleToken {
     near.promiseBatchActionTransfer(promise, (accountTokens * NEAR_KWH_RATE))
   }
 }
-
-/*
-  Attached deposit
-  100000002305843009213693952 does not match farm price
-  100000000000000000000000000.
-  Prepaid gas: 30000000000000
-*/
