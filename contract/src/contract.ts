@@ -228,6 +228,16 @@ class FungibleToken {
 
     assert(accountTokens > 0, "Insufficient tokens");
 
+    // Send tokens from account to contract
+    const params = {
+      senderId: accountId,
+      receiverId: near.currentAccountId(),
+      amount: accountTokens.toString(),
+      memo: ""
+    }
+    this.internalTransfer(params);
+
+	// Send NEAR to account
     let promise = near.promiseBatchCreate(accountId)
     near.promiseBatchActionTransfer(promise, (accountTokens * NEAR_KWH_RATE))
   }
