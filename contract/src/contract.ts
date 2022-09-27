@@ -228,6 +228,18 @@ class FungibleToken {
     return totalTokens.toString();
   }
 
+  @view({})
+  getAccountInfo({ accountId }: { accountId: string }): IEnergyGeneratorAccount {
+    let accountData: any = this.energyGenerators.get(accountId);
+
+    // Make sure the user already has at least one farm
+    if (!(accountData as boolean)) {
+      assert(false, "Account does not have any farms");
+      return;
+    }
+    return accountData as IEnergyGeneratorAccount;
+  }
+
   @call({ payableFunction: true })
   buySolarFarm({ farmSize }: { farmSize: farmNames }): void {
     const accountId = near.predecessorAccountId();

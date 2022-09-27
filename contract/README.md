@@ -122,7 +122,30 @@ The totalPowerRate is the sum of the farms' powerRate.
 near view $CONTRACT_NAME getEnergyGenerated '{"accountId": "<accountId>.testnet"}'
 ```
 
-## 8. Get tokens from energy generated.
+## 8. Account info.
+Thet Total power rate, farms and last withdrawal timestamp.
+
+The totalPowerRate is the sum of the farms' powerRate.
+
+```bash
+near view $CONTRACT_NAME getAccountInfo '{"accountId": "luisguve.testnet"}'
+```
+
+Example result:
+
+```json
+{
+  totalPowerRate: 440,
+  farms: [
+    { name: 'small', powerRate: 160, panels: 80 },
+    { name: 'medium', powerRate: 280, panels: 140 }
+  ],
+  accountId: 'luisguve.testnet',
+  lastWithdrawal: 1664290021
+}
+```
+
+## 9. Get tokens from energy generated.
 1 KWh generated is equal to 1 token.
 
 ```bash
@@ -132,7 +155,7 @@ near call $CONTRACT_NAME withdraw --accountId <accountId>.testnet
 
 <br />
 
-## 9. Swap tokens for NEAR.
+## 10. Swap tokens for NEAR.
 
 ```bash
 near call $CONTRACT_NAME redeem --accountId <accountId>.testnet
