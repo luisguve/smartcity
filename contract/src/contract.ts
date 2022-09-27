@@ -213,6 +213,21 @@ class FungibleToken {
     return this.energyGenerators.toArray();
   }
 
+  @view({})
+  getEnergyGenerated({ accountId }: { accountId: string }): string {
+    let accountData: any = this.energyGenerators.get(accountId);
+
+    // Make sure the user already has at least one farm
+    if (!(accountData as boolean)) {
+      assert(false, "Account does not have any farms");
+      return;
+    }
+    const energyGeneratorAccount = new EnergyGeneratorAccount(accountData as IEnergyGeneratorAccount);
+
+    const totalTokens = calculateProduction(energyGeneratorAccount, near.blockTimestamp());
+    return totalTokens.toString();
+  }
+
   @call({ payableFunction: true })
   buySolarFarm({ farmSize }: { farmSize: farmNames }): void {
     const accountId = near.predecessorAccountId();

@@ -73,9 +73,9 @@ near view $CONTRACT_NAME ftBalanceOf '{"accountId": "<account>.testnet"}'
 
 
 ## 5. Buy a solar farm to start generating tokens
-`buySolarFarm` is a `call` method. It receives one parameter, `farmSize` which is either `small`, `medium` or `big`.
+`buySolarFarm` receives one parameter, `farmSize` which is either `small`, `medium` or `big`.
 
-This method requires to send NEAR. 
+This method requires to send NEAR.
 
 - 10 NEAR if `farmSize` is `small`, 
 - 16 NEAR if `farmSize` is `medium`
@@ -85,6 +85,7 @@ This method requires to send NEAR.
 near call $CONTRACT_NAME buySolarFarm --accountId <accountId>.testnet --deposit 10 '{"farmSize": "small"}'
 ```
 
+
 <br />
 
 ## 6. Get the list of farms
@@ -93,9 +94,36 @@ near call $CONTRACT_NAME buySolarFarm --accountId <accountId>.testnet --deposit 
 near view $CONTRACT_NAME getEnergyGenerators
 ```
 
+Result:
+
+```json
+[
+  [
+    'luisguve.testnet',
+    {
+      totalPowerRate: 160,
+      farms: [
+        { name: 'small', powerRate: 160, panels: 80 }
+      ],
+      accountId: 'luisguve.testnet',
+      lastWithdrawal: 1664290021
+    }
+  ]
+]
+```
 <br />
 
-## 7. Calculate energy produced (KWh) and get tokens.
+## 7. Get energy generated (KWh).
+The energy generated in KWh is calculated by multiplying the amount of hours since the last withdrawal by the totalPowerRate of the account.
+
+The totalPowerRate is the sum of the farms' powerRate.
+
+```bash
+near view $CONTRACT_NAME getEnergyGenerated '{"accountId": "<accountId>.testnet"}'
+```
+
+## 8. Get tokens from energy generated.
+1 KWh generated is equal to 1 token.
 
 ```bash
 near call $CONTRACT_NAME withdraw --accountId <accountId>.testnet
@@ -104,7 +132,7 @@ near call $CONTRACT_NAME withdraw --accountId <accountId>.testnet
 
 <br />
 
-## 8. Swap tokens for NEAR.
+## 9. Swap tokens for NEAR.
 
 ```bash
 near call $CONTRACT_NAME redeem --accountId <accountId>.testnet
