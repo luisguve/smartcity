@@ -4,6 +4,7 @@ import {
   view,
   initialize,
   near,
+  UnorderedMap,
   LookupMap,
   assert
 } from "near-sdk-js";
@@ -30,9 +31,9 @@ const NEAR_KWH_RATE = BigInt('600000000000000000000');
 type farmNames = "small" | "medium" | "big"
 
 const farmNamesPricesMapping: Record<farmNames, bigint> = {
-  "small": BigInt(100) * ONE_NEAR,
-  "medium": BigInt(160) * ONE_NEAR,
-  "big": BigInt(250) * ONE_NEAR
+  "small": BigInt(10) * ONE_NEAR,
+  "medium": BigInt(16) * ONE_NEAR,
+  "big": BigInt(25) * ONE_NEAR
 }
 
 interface Farm {
@@ -48,51 +49,93 @@ const FARMS: Record<farmNames, Farm> = {
     panels: 80
   },
   "medium": {
-    name: "big",
+    name: "medium",
     powerRate: 280,
     panels: 140
   },
   "big": {
-    name: "small",
+    name: "big",
     powerRate: 420,
     panels: 210
   },
 }
 
-interface SolarFarmParams {
-  account_id: string
+interface INewAccount {
+  accountId: string
   initialFarm: Farm
-}
+  timestamp: bigint
+};
+
+interface IAlreadyExistentAccount {
+  accountId: string
+  totalPowerRate: number
+  lastWithdrawal: number
+  farms: Farm[]
+};
 
 @NearBindgen({})
 class EnergyGeneratorAccount {
   accountId: string;
 
-  lastWithdrawal: Date;
+  lastWithdrawal: number; // timestamp in seconds
   totalPowerRate: number = 0;
 
   farms: Farm[] = [];
 
-  constructor(props: SolarFarmParams) {
-    const { account_id, initialFarm } = props
-    this.accountId = account_id;
-    this.farms = [initialFarm];
-    this.lastWithdrawal = new Date();
+  constructor(props: INewAccount | IAlreadyExistentAccount) {
+    if (props instanceof INewAccount) {
+      // This is a new account
+      const { accountId, initialFarm, timestamp } = props;
+
+      this.accountId = accountId;
+      this.farms = [initialFarm];
+
+      // Timestamp comes as nanoseconds.
+      // We need to convert it to seconds.
+      const timestampSeconds = this.nanosecondsToSeconds(timestamp);
+
+      this.totalPowerRate = initialFarm.powerRate;
+      this.lastWithdrawal = timestampSeconds;
+
+    } else {
+      // Account already exists - set old data
+      const { accountId, totalPowerRate, lastWithdrawal, farms } = props
+      this.accountId = accountId;
+      this.lastWithdrawal = lastWithdrawal;
+      this.totalPowerRate = totalPowerRate;
+      this.farms = farms;
+      return;
+    }
   }
 
   addFarm(farm: Farm) {
     this.farms.push(farm);
-    const powerRate = this.farms.reduce((total, farm) => total + farm.powerRate, 0);
-    this.totalPowerRate = powerRate;
+    this.totalPowerRate = this.totalPowerRate + farm.powerRate;
   }
 
-  calculateProduction(): bigint {
-    const now = new Date();
+  calculateProduction(now: bigint): bigint {
+
+    // Timestamp now comes as nanoseconds.
+    // We need to convert it to seconds.
+    const timestampSeconds = this.nanosecondsToSeconds(now);
+
+    const diffSeconds = timestampSeconds - this.lastWithdrawal;
 
     // Get the number of hours between last withdrawal and now
-    const hours = Math.floor(now.getHours() - this.lastWithdrawal.getHours());
+    const hours = Math.floor(diffSeconds / (60 * 60)); // converting seconds to hours
 
     return BigInt(hours * this.totalPowerRate);
+  }
+
+  nanosecondsToSeconds(ns: bigint): number {
+    // We convert nanoseconds to seconds by dividing it by 1,000,000,000.
+    // Then, the resulting bigint is converted to String.
+    // Once we've got the seconds as a string, we get rid of the decimals with Math.floor.
+    return Math.floor(
+      Number(
+        (ns / BigInt(1000000000)).toString()
+      )
+    );
   }
 }
 
@@ -102,10 +145,10 @@ class FungibleToken {
   accounts = new LookupMap("tokens");
   totalSupply = "200000000";
 
-  energyGenerators = new LookupMap("energy_generators");
+  energyGenerators = new UnorderedMap("energy_generators");
 
   @initialize({})
-  init (): void {
+  init(): void {
     this.accounts.set(near.currentAccountId(), this.totalSupply);
   }
 
@@ -171,6 +214,11 @@ class FungibleToken {
     return (this.accounts.get(accountId) as string) || "0";
   }
 
+  @view({})
+  getEnergyGenerators(): [string, unknown][] {
+    return this.energyGenerators.toArray();
+  }
+
   @call({ payableFunction: true })
   buySolarFarm({ farmSize }: { farmSize: farmNames }): void {
     const accountId = near.predecessorAccountId();
@@ -182,31 +230,42 @@ class FungibleToken {
 
     const newFarm: Farm = FARMS[farmSize]
 
-    let energyGeneratorAccount = this.energyGenerators.get(accountId)
+    let energyGeneratorAccount: EnergyGeneratorAccount;
+    const accountData: any = this.energyGenerators.get(accountId);
 
-    if (energyGeneratorAccount instanceof EnergyGeneratorAccount) {
-      // Account alredy exists - add farm
+    const accountAlreadyExists = (accountData as boolean);
+
+    if (accountAlreadyExists) {
+      // Account alredy exists.
+      // Add farm.
+      energyGeneratorAccount = new EnergyGeneratorAccount(accountData as IAlreadyExistentAccount);
       energyGeneratorAccount.addFarm(newFarm)
     } else {
       // New account - create account
-      energyGeneratorAccount = new EnergyGeneratorAccount({account_id: accountId, initialFarm: newFarm})
+      const props: INewAccount = {
+        accountId,
+        initialFarm: newFarm,
+        timestamp: near.blockTimestamp()
+      }
+      energyGeneratorAccount = new EnergyGeneratorAccount(props)
     }
 
     this.energyGenerators.set(accountId, energyGeneratorAccount)
   }
 
   @call({})
-  withdraw(): void {
+  withdraw(): string {
     const accountId = near.predecessorAccountId();
-    let energyGeneratorAccount = this.energyGenerators.get(accountId)
+    let accountData: any = this.energyGenerators.get(accountId)
 
-    if (!(energyGeneratorAccount instanceof EnergyGeneratorAccount)) {
-      // Make sure the user already has at least one farm
+    // Make sure the user already has at least one farm
+    if (!(accountData as boolean)) {
       assert(false, "Account does not have any farms");
       return;
     }
+    const energyGeneratorAccount = new EnergyGeneratorAccount(accountData as IAlreadyExistentAccount);
 
-    const totalTokens = energyGeneratorAccount.calculateProduction()
+    const totalTokens = energyGeneratorAccount.calculateProduction(near.blockTimestamp())
 
     assert(totalTokens > 0, "No tokens to withdraw");
 
@@ -218,10 +277,12 @@ class FungibleToken {
     }
 
     this.internalTransfer(params);
+
+    return totalTokens.toString();
   }
 
   @call({})
-  redeem(): void {
+  redeem(): string {
     const accountId = near.predecessorAccountId();
     const accountTokens = BigInt(this.ftBalanceOf({ accountId }));
 
@@ -233,11 +294,15 @@ class FungibleToken {
       receiverId: near.currentAccountId(),
       amount: accountTokens.toString(),
       memo: ""
-    }
+    };
     this.internalTransfer(params);
 
-	// Send NEAR to account
-    let promise = near.promiseBatchCreate(accountId)
-    near.promiseBatchActionTransfer(promise, (accountTokens * NEAR_KWH_RATE))
+    const nearAmount: bigint = accountTokens * NEAR_KWH_RATE;
+
+    // Send NEAR to account
+    let promise = near.promiseBatchCreate(accountId);
+    near.promiseBatchActionTransfer(promise, nearAmount);
+
+    return nearAmount.toString();
   }
 }

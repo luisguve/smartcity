@@ -37,43 +37,76 @@ You can automatically compile and deploy the contract in the NEAR testnet by run
 npm run deploy
 ```
 
-Once finished, check the `neardev/dev-account` file to find the address in which the contract was deployed:
+Once finished, set the CONTRACT_NAME environment variable from `neardev/dev-account.env` file to get the address in which the contract was deployed:
 
 ```bash
-cat ./neardev/dev-account
-# e.g. dev-1659899566943-21539992274727
+source ./neardev/dev-account.env
 ```
 
 <br />
 
-## 2. Retrieve the Greeting
-
-`get_greeting` is a read-only method (aka `view` method).
-
-`View` methods can be called for **free** by anyone, even people **without a NEAR account**!
+## 2. Init the contract
 
 ```bash
-# Use near-cli to get the greeting
-near view <dev-account> get_greeting
+near call $CONTRACT_NAME init --accountId $CONTRACT_NAME
 ```
 
 <br />
 
-## 3. Store a New Greeting
-`set_greeting` changes the contract's state, for which it is a `call` method.
-
-`Call` methods can only be invoked using a NEAR account, since the account needs to pay GAS for the transaction.
+## 3. Get the total supply
 
 ```bash
-# Use near-cli to set a new greeting
-near call <dev-account> set_greeting '{"greeting":"howdy"}' --accountId <dev-account>
+near view $CONTRACT_NAME ftTotalSupply
+# result: "200000000"
 ```
 
-**Tip:** If you would like to call `set_greeting` using your own account, first login into NEAR using:
+<br />
+
+## 4. Get balance of account.
 
 ```bash
-# Use near-cli to login your NEAR account
-near login
+near view $CONTRACT_NAME ftBalanceOf '{"accountId": "<account>.testnet"}'
+# result: "0"
 ```
 
-and then use the logged account to sign the transaction: `--accountId <your-account>`.
+<br />
+
+
+## 5. Buy a solar farm to start generating tokens
+`buySolarFarm` is a `call` method. It receives one parameter, `farmSize` which is either `small`, `medium` or `big`.
+
+This method requires to send NEAR. 
+
+- 10 NEAR if `farmSize` is `small`, 
+- 16 NEAR if `farmSize` is `medium`
+- 25 NEAR if `farmSize` is `big`
+
+```bash
+near call $CONTRACT_NAME buySolarFarm --accountId <accountId>.testnet --deposit 10 '{"farmSize": "small"}'
+```
+
+<br />
+
+## 6. Get the list of farms
+
+```bash
+near view $CONTRACT_NAME getEnergyGenerators
+```
+
+<br />
+
+## 7. Calculate energy produced (KWh) and get tokens.
+
+```bash
+near call $CONTRACT_NAME withdraw --accountId <accountId>.testnet
+# this call returns the amount of tokens
+```
+
+<br />
+
+## 8. Swap tokens for NEAR.
+
+```bash
+near call $CONTRACT_NAME redeem --accountId <accountId>.testnet
+# this call returns the amount of NEAR received
+```
