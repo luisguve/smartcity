@@ -1,8 +1,23 @@
-near-blank-project
+# Smart city: simulating the tokenization of energy produced in a green, decentralized way.
 ==================
 
-This app was initialized with [create-near-app]
+This app was initialized with [create-near-app] using typescript as the language of the smart contract and vanilla javascript in the frontend.
 
+## Overview
+=================
+
+In this simulator, users are able to buy solar farms to produce and supply energy to the grid.
+
+The solar farms come in three different sizes, and to simplify the calculations, we are going to assume that there are 5 peak sun hours everyday and this value keeps constant.
+
+
+| Size   | Price (NEAR) | Panels (400W) | KWh per day |
+|--------|--------------|---------------|-------------|
+| small  | 100          | 80            | 160         |
+| medium | 160          | 140           | 280         |
+| big    | 250          | 210           | 420         |
+
+The main idea here is that the tokens will be paired with the KWs that will be produced by the farms per hour.
 
 Quick Start
 ===========
@@ -20,7 +35,7 @@ Test your contract:
 
     npm test
 
-If you have a frontend, run `npm start`. This will run a dev server.
+To start the frontend in local server, run `npm start`.
 
 
 Exploring The Code
