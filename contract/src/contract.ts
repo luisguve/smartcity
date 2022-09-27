@@ -31,9 +31,9 @@ const NEAR_KWH_RATE = BigInt('600000000000000000000');
 type farmNames = "small" | "medium" | "big"
 
 const farmNamesPricesMapping: Record<farmNames, bigint> = {
-  "small": BigInt(10) * ONE_NEAR,
-  "medium": BigInt(16) * ONE_NEAR,
-  "big": BigInt(25) * ONE_NEAR
+  "small": BigInt(100) * ONE_NEAR,
+  "medium": BigInt(160) * ONE_NEAR,
+  "big": BigInt(250) * ONE_NEAR
 }
 
 interface Farm {
@@ -298,6 +298,10 @@ class FungibleToken {
     }
 
     this.internalTransfer(params);
+
+    // Reset lastWithdrawal
+    energyGeneratorAccount.lastWithdrawal = nanosecondsToSeconds(near.blockTimestamp());
+    this.energyGenerators.set(accountId, energyGeneratorAccount);
 
     return totalTokens.toString();
   }
