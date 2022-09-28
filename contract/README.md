@@ -51,17 +51,17 @@ near view $CONTRACT_NAME ftBalanceOf '{"accountId": "<account>.testnet"}'
 <br />
 
 
-## 5. Buy a solar farm to start generating tokens
+## 5. Buy a solar farm to start generating KWhs
 `buySolarFarm` receives one parameter, `farmSize` which is either `small`, `medium` or `big`.
 
 This method requires to send NEAR.
 
-- 10 NEAR if `farmSize` is `small`, 
-- 16 NEAR if `farmSize` is `medium`
-- 25 NEAR if `farmSize` is `big`
+- 100 NEAR if `farmSize` is `small`, 
+- 160 NEAR if `farmSize` is `medium`
+- 250 NEAR if `farmSize` is `big`
 
 ```bash
-near call $CONTRACT_NAME buySolarFarm --accountId <accountId>.testnet --deposit 10 '{"farmSize": "small"}'
+near call $CONTRACT_NAME buySolarFarm --accountId <accountId>.testnet --deposit 100 '{"farmSize": "small"}'
 ```
 
 
@@ -92,19 +92,19 @@ Result:
 ```
 <br />
 
-## 7. Get energy generated (KWh).
+## 7. Get energy generated so far (KWh).
 The energy generated in KWh is calculated by multiplying the amount of hours since the last withdrawal by the totalPowerRate of the account.
 
-The totalPowerRate is the sum of the farms' powerRate.
+The totalPowerRate is the sum of all the farms' powerRate.
 
 ```bash
 near view $CONTRACT_NAME getEnergyGenerated '{"accountId": "<accountId>.testnet"}'
 ```
 
-## 8. Account info.
+## 8. Get account info.
 Thet Total power rate, farms and last withdrawal timestamp.
 
-The totalPowerRate is the sum of the farms' powerRate.
+The totalPowerRate is the sum of all the farms' powerRate.
 
 ```bash
 near view $CONTRACT_NAME getAccountInfo '{"accountId": "luisguve.testnet"}'
