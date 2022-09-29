@@ -1,13 +1,13 @@
 /* Talking with a contract often involves transforming data, we recommend you to encapsulate that logic into a class */
 
-export class HelloNEAR {
+export class SmartCity {
   constructor({ contractId, walletToUse }) {
     this.contractId = contractId;
     this.wallet = walletToUse;    
   }
 
-  async getGreeting() {
-    return await this.wallet.viewMethod({ contractId: this.contractId, method: 'get_greeting' });
+  async getEnergyGenerators() {
+    return await this.wallet.viewMethod({ contractId: this.contractId, method: 'getEnergyGenerators' });
   }
 
   async setGreeting(greeting) {
