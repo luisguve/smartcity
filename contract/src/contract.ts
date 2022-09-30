@@ -214,13 +214,12 @@ class FungibleToken {
   }
 
   @view({})
-  getEnergyGenerated({ accountId }: { accountId: string }): string {
+  getEnergyGenerated({ accountId }: { accountId: string }): string | null {
     let accountData: any = this.energyGenerators.get(accountId);
 
-    // Make sure the user already has at least one farm
     if (!(accountData as boolean)) {
-      assert(false, "Account does not have any farms");
-      return;
+      // Account does not have any farms
+      return null;
     }
     const energyGeneratorAccount = new EnergyGeneratorAccount(accountData as IEnergyGeneratorAccount);
 
@@ -229,13 +228,12 @@ class FungibleToken {
   }
 
   @view({})
-  getAccountInfo({ accountId }: { accountId: string }): IEnergyGeneratorAccount {
+  getAccountInfo({ accountId }: { accountId: string }): IEnergyGeneratorAccount | null {
     let accountData: any = this.energyGenerators.get(accountId);
 
-    // Make sure the user already has at least one farm
     if (!(accountData as boolean)) {
-      assert(false, "Account does not have any farms");
-      return;
+      // Account does not have any farms
+      return null;
     }
     return accountData as IEnergyGeneratorAccount;
   }

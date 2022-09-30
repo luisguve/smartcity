@@ -10,35 +10,7 @@
   <link rel="stylesheet" href="assets/global.css">
 </head>
 <body>
-  <main id="signed-out-flow" style="display: none">
-    <h1>
-      Smart city s1mulat0r: decentralized energy
-    </h1>
-    <p>
-      Buy solar farms, produce and supply energy to the grid, get tokens
-    </p>
-    <p style="text-align: center; margin-top: 2.5em">
-      <button id="sign-in-button">Sign in with NEAR Wallet</button>
-    </p>
-    <section data-behavior="energy-generators-table-container">
-      <h3 data-behavior="heading"></h3>
-      <table data-behavior="energy-generators"></table>
-    </section>
-
-  </main>
-
-  <div id="signed-in-flow" style="display: none">
-    <button style="float: right" id="sign-out-button">
-      Sign out <span data-behavior="account-id"></span>
-    </button>
-    <main>
-      <section data-behavior="energy-generators-table-container">
-        <h3 data-behavior="heading"></h3>
-        <table data-behavior="energy-generators"></table>
-      </section>
-    </main>
-  </div>
-
-  <script src="index.js" type="module"></script>
+  <script type="module" src="lit/app.js"></script>
+  <app-entry-point></app-entry-point>
 </body>
 </html>

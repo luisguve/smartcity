@@ -105,6 +105,16 @@ async function fetchEnergyGenerators() {
   });
 }
 
+async function fetchAccountInfo() {
+  const data = await smartCity.getAccountInfo();
+
+  if (data == null) {
+    return;
+  }
+
+  
+}
+
 // Display the signed-out-flow container
 function signedOutFlow() {
   document.querySelector('#signed-in-flow').style.display = 'none';
