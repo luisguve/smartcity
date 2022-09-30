@@ -25,7 +25,7 @@ el valor de cada token sera de 0.0006 $NEAR
 
 const ONE_NEAR: bigint = BigInt('1000000000000000000000000');
 
-// Valor de tokens de KWh equivalente en NEAR
+// Valor de tokens de KWh equivalente en NEAR -> 0.0006 NEAR
 const NEAR_KWH_RATE = BigInt('600000000000000000000');
 
 type farmNames = "small" | "medium" | "big"

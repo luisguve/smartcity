@@ -32,4 +32,32 @@ export class SmartCity {
       }
     );
   }
+
+  async withdraw() {
+    return await this.wallet.callMethod(
+      {
+        contractId: this.contractId,
+        method: 'withdraw'
+      }
+    );
+  }
+
+  async balanceOf(accountId) {
+    return await this.wallet.viewMethod(
+      {
+        contractId: this.contractId,
+        method: 'ftBalanceOf',
+        args: { accountId }
+      }
+    );
+  }
+
+  async redeem() {
+    return await this.wallet.callMethod(
+      {
+        contractId: this.contractId,
+        method: 'redeem'
+      }
+    );
+  }
 }

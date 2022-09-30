@@ -21,6 +21,8 @@ const farmsInfoMapping = {
   }
 }
 
+const NEAR_KWH_RATE = 0.0006;
+
 export class AppEntryPoint extends LitElement {
   static properties = {
     _isLoggedIn: {
@@ -38,6 +40,9 @@ export class AppEntryPoint extends LitElement {
     },
     _accountInfo: {
       state: true
+    },
+    _tokensBalance: {
+      state: true
     }
   };
   // Define scoped styles right with your component, in plain CSS
@@ -51,6 +56,7 @@ export class AppEntryPoint extends LitElement {
     this._contract = new SmartCity({ contractId: process.env.CONTRACT_NAME, walletToUse: this._wallet });
     this._energyGenerators = [];
     this._accountInfo = null;
+    this._tokensBalance = 0;
   }
 
   connectedCallback() {
@@ -63,6 +69,7 @@ export class AppEntryPoint extends LitElement {
 
       if (ctx._isLoggedIn) {
         ctx.fetchUserInfo();
+        ctx.fecthTokensBalance();
       }
 
       ctx.fetchEnergyGenerators();
@@ -83,6 +90,14 @@ export class AppEntryPoint extends LitElement {
       console.error("Error while getting account info", err);
     }
   }
+  async fecthTokensBalance() {
+    try {
+      this._tokensBalance = await this._contract.balanceOf(this._wallet.accountId); 
+    } catch(err) {
+      console.error("Error while getting balance", err);
+    }
+  }
+
   async buyFarm(farmSize) {
     try {
       console.log("Buying farm");
@@ -95,8 +110,17 @@ export class AppEntryPoint extends LitElement {
   async withdraw() {
     try {
       const tokensWithdrawn = await this._contract.withdraw();
+      console.log(tokensWithdrawn, "tokens withdrawn");
     } catch(err) {
       console.error("Error while withdrawing", err);
+    }
+  }
+  async redeem() {
+    try {
+      const NearValue = await this._contract.redeem();
+      console.log(NearValue, "near redeemed");
+    } catch(err) {
+      console.error("Error while redeeming", err);
     }
   }
 
@@ -104,7 +128,7 @@ export class AppEntryPoint extends LitElement {
     this._wallet.signIn();
   }
   logout() {
-    this._wallet.logout();
+    this._wallet.signOut();
   }
   renderWithdrawButton() {
     const data = this._accountInfo;
@@ -121,12 +145,61 @@ export class AppEntryPoint extends LitElement {
     }
 
     return html`
-      <button @click="${withdraw}">Withdraw ${KWhGenerated} tokens</button>
+      <button @click="${this.withdraw}">Withdraw ${KWhGenerated} tokens</button>
     `;
   }
   renderRedeemButton() {
-    
+    const data = this._accountInfo;
+    if (!data) {
+      return null;
+    }
+    const tokens = this._tokensBalance;
+
+    if (!(tokens > 0)) {
+      return html`<p>0 tokens to redeem</p>`;
+    }
+
+    const NearValue = tokens * NEAR_KWH_RATE;
+
+    return html`
+      <button @click="${this.redeem}">Redeem ${NearValue} NEAR</button>
+    `;
   }
+  renderLastWithdrawal() {
+    const data = this._accountInfo;
+    if (!data) {
+      return null;
+    }
+    const lastWithdrawal = new Date(data.lastWithdrawal * 1000).toLocaleString();
+    const diffSeconds = Math.floor(Date.now() / 1000) - data.lastWithdrawal;
+
+    const hours = Math.floor(diffSeconds / 3600);
+    const days = Math.floor(hours / 24);
+
+    let daysStr = "";
+    if (days > 0) {
+      daysStr = days + ((days > 1) ? " days, " : " day, ");
+    }
+
+    let hoursStr = (hours % 24) + " hours";
+    if ((hours % 24) == 1) {
+      hoursStr = "1 hour"
+    }
+
+    const timeElapsed = `${daysStr} ${hoursStr} ago`;
+
+    return html`
+      <p>Last withdrawal: ${lastWithdrawal} (${timeElapsed})</p>
+    `;
+  }
+  renderTokensBalance() {
+    const tokens = this._tokensBalance;
+    const NearValue = (tokens > 0) ? `, equivalent to ${tokens * NEAR_KWH_RATE} NEAR` : ""
+    return html`
+      <h3>${tokens} tokens (KWh) in your wallet${NearValue}</h3>
+    `;
+  }
+
   renderUserInfo() {
     const data = this._accountInfo;
     if (data == null) {
@@ -155,7 +228,7 @@ export class AppEntryPoint extends LitElement {
           <h4>${farmSize}: ${farmInfo.powerRate} KWh</h4>
           <h6>${farms.length} ${(farms.length > 1) ? "farms" : "farm"}</h6>
           ${desc}
-          <strong>Price: ${farmInfo.price}</strong>
+          <strong>Price: ${farmInfo.price} NEAR</strong>
           <button @click="${buyFarm}">Buy farm</button>
         </article>
       `);
@@ -163,10 +236,12 @@ export class AppEntryPoint extends LitElement {
 
     return html`
     <section data-behavior="dashboard">
+      ${this.renderTokensBalance()}
       <h4>Total power rate of your farms: ${data.totalPowerRate ?? 0} KWh</h4>
       ${farmsSections}
-      ${renderWithdrawButton()}
-      ${renderRedeemButton()}
+      ${this.renderLastWithdrawal()}
+      ${this.renderWithdrawButton()}
+      ${this.renderRedeemButton()}
     </section>
     `;
   }
@@ -234,7 +309,7 @@ export class AppEntryPoint extends LitElement {
     const unauthenticatedWorkflow = html`
     <section class="signed-out-flow">
       <p style="text-align: center; margin-top: 2.5em">
-        <button @click="${this._login}" id="sign-in-button">Sign in with NEAR Wallet</button>
+        <button @click="${this.login}" id="sign-in-button">Sign in with NEAR Wallet</button>
       </p>
       ${this.renderEnergyGenerators()}
     </section>
