@@ -1,19 +1,35 @@
 <template>
-  <button @click="increment()">increment {{count}}!</button>
+  <main>
+    <h1>Smart city simulator: decentralized energy</h1>
+    <p>Buy solar farms, produce and supply energy to the grid, get tokens</p>
+    <EnergyGeneratorsTable />
+    <Dashboard />
+    <ClassifiedFarms />
+  </main>
 </template>
 
 <script>
-  import { mapState, mapActions } from "pinia";
+  import { mapActions } from "pinia";
+
+  import EnergyGeneratorsTable from "./EnergyGeneratorsTable.vue";
+  import Dashboard from "./Dashboard.vue";
+  import ClassifiedFarms from "./ClassifiedFarms.vue";
   import { useMainStore } from "../store";
+
   export default {
     data() {
       return {};
     },
-    computed: {
-      ...mapState(useMainStore, ["count"])
+    components: {
+      EnergyGeneratorsTable,
+      Dashboard,
+      ClassifiedFarms
     },
     methods: {
-      ...mapActions(useMainStore, ["increment"])
+      ...mapActions(useMainStore, ["startUp"])
+    },
+    mounted() {
+      this.startUp();
     }
   };
 </script>
