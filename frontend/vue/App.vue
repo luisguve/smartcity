@@ -2,7 +2,7 @@
   <div class="top container-fluid">
     <div class="container">
       <header class="d-flex flex-column align-items-center">
-        <h1>Smart city simulator: decentralized energy</h1>
+        <h1 class="text-center">Smart city simulator: decentralized energy</h1>
         <span class="d-flex align-items-center">
           <p class="mb-0">Buy solar farms, produce and supply energy to the grid, get tokens</p>
           <button
