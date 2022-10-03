@@ -14,17 +14,17 @@
         <thead>
           <tr>
             <th scope="col">Account</th>
-            <th scope="col">Farms</th>
+            <th scope="col" class="hide-mobile">Farms</th>
             <th scope="col">Capacity</th>
-            <th scope="col">KWh generated</th>
+            <th scope="col" class="hide-mobile">KWh generated</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="element in tableRows">
             <th scope="row">{{element.accountId}}</th>
-            <td>{{element.farms}}</td>
+            <td class="hide-mobile">{{element.farms}}</td>
             <td>{{element.totalPowerRate}} KWh</td>
-            <td>{{element.KWhGenerated}}</td>
+            <td class="hide-mobile">{{element.KWhGenerated}}</td>
           </tr>
         </tbody>
       </table>
@@ -100,6 +100,11 @@
     /* Handle on hover */
     ::-webkit-scrollbar-thumb:hover {
       background: #555;
+    }
+  }
+  @media screen and (max-width: 767px) {
+    .hide-mobile {
+      display: none;
     }
   }
 </style>

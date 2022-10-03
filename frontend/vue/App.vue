@@ -3,19 +3,21 @@
     <div class="container">
       <header class="d-flex flex-column align-items-center">
         <h1 class="text-center">Smart city simulator: decentralized energy</h1>
-        <span class="d-flex align-items-center">
-          <p class="mb-0">Buy solar farms, produce and supply energy to the grid, get tokens</p>
-          <button
-            type="button"
-            class="btn btn-light btn-sm ms-2"
-            data-bs-toggle="modal" data-bs-target="#infoModal"
-          ><i class="fa fa-info-circle" aria-hidden="true"></i></button>
-          <a
-            href="https://github.com/luisguve/smartcity"
-            target="blank"
-            rel="noreferrer"
-            class="btn btn-link btn-sm ms-2"
-          ><i class="fa fa-github" aria-hidden="true"></i></a>
+        <span class="d-flex flex-column flex-md-row align-items-center">
+          <p class="mb-0 text-center">Buy solar farms, produce and supply energy to the grid, get tokens</p>
+          <span>
+            <button
+              type="button"
+              class="btn btn-light btn-sm ms-2"
+              data-bs-toggle="modal" data-bs-target="#infoModal"
+            ><i class="fa fa-info-circle" aria-hidden="true"></i></button>
+            <a
+              href="https://github.com/luisguve/smartcity"
+              target="blank"
+              rel="noreferrer"
+              class="btn btn-link btn-sm ms-2"
+            ><i class="fa fa-github" aria-hidden="true"></i></a>
+          </span>
         </span>
         <InfoModal />
       </header>
@@ -24,10 +26,10 @@
         <aside :class="asideClass">
           <EnergyGeneratorsTable />
         </aside>
-        <div class="col-12 col-lg-6 ps-5">
+        <div class="col-12 col-lg-6 mt-4 mt-md-0 ps-md-5">
           <Dashboard />
         </div>
-        <div class="col-12 mt-4">
+        <div class="col-12 mt-4 mb-4 mb-lg-0">
           <ClassifiedFarms />
         </div>
       </main>

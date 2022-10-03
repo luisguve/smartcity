@@ -9,14 +9,15 @@
         <div class="modal-body">
           <p>Smart city simulates the <strong><em>tokenization</em></strong> of energy produced in a green, decentralized way.</p>
           <p>In this simulator, users are able to buy solar farms to produce and supply energy to the grid.</p>
-          <p>The solar farms come in three different sizes, and to simplify the calculations, we are going to assume that there are 5 peak sun hours everyday and this value keeps constant.</p>
+          <p>The solar farms come in three different sizes, and to simplify the calculations, we are going to assume that the production of energy will keep constant all day.</p>
+          <p>In the real life, the production of energy would be proportional to the sun peak hours, but this is just a simplified simulation.</p>
           <table class="table table-sm table-light table-hover mb-0">
             <thead>
               <tr>
                 <th scope="col">Size</th>
                 <th scope="col">Price (NEAR)</th>
                 <th scope="col">Panels (400W)</th>
-                <th scope="col">Capacity (KWh per day)</th>
+                <th scope="col">Capacity (KWh)</th>
               </tr>
             </thead>
             <tbody>

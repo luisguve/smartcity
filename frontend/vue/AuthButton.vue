@@ -4,9 +4,11 @@
     <button @click="login" class="btn btn-primary">Sign in with NEAR Wallet</button>
   </section>
   <!-- Active session -->
-  <button v-else @click="logout" class="logout btn btn-secondary">
-    Sign out <span>{{accountId}}</span>
-  </button>
+  <section v-else class="logout-container">
+    <button @click="logout" class="logout btn btn-secondary">
+      Sign out <span>{{accountId}}</span>
+    </button>
+  </section>
 </template>
 
 <script>
@@ -43,6 +45,10 @@
     z-index: 10;
   }
   @media screen and (max-width: 768px) {
+    .logout-container {
+      display: flex;
+      justify-content: center;
+    }
     button.logout {
       position: initial;
     }

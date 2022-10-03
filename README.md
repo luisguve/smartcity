@@ -8,14 +8,15 @@ This app was initialized with [create-near-app] using typescript as the language
 
 In this simulator, users are able to buy solar farms to produce and supply energy to the grid.
 
-The solar farms come in three different sizes, and to simplify the calculations, we are going to assume that there are 5 peak sun hours everyday and this value keeps constant.
+The solar farms come in three different sizes, and to simplify the calculations, we are going to assume that the production of energy will keep constant all day.
 
+In the real life, the production of energy would be proportional to the sun peak hours, but this is just a simplified simulation.
 
-| Size   | Price (NEAR) | Panels (400W) | KWh per day |
-|--------|--------------|---------------|-------------|
-| small  | 100          | 80            | 160         |
-| medium | 160          | 140           | 280         |
-| big    | 250          | 210           | 420         |
+| Size   | Price (NEAR) | Panels (400W) | Capacity (KWh) |
+|--------|--------------|---------------|----------------|
+| small  | 100          | 80            | 160            |
+| medium | 160          | 140           | 280            |
+| big    | 250          | 210           | 420            |
 
 The main idea here is that the tokens will be paired with the KWs per hour that will be produced by the farms.
 
