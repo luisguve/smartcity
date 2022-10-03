@@ -80,10 +80,10 @@
 <style scoped>
   @media screen and (min-width: 768px) {
     .top.container-fluid {
-      min-height: 100vh;
+      /*min-height: 100vh;
       background-image: url("../assets/solar-panels-g2ae1d0103_1280.jpg");
       background-size: cover;
-      background-position: center;
+      background-position: center;*/
     }
   }
 </style>
