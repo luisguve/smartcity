@@ -10,7 +10,7 @@
   <template v-else>
     <h4 class="text-center">{{solarFarmsCountText}}</h4>
     <div class="table-container">
-      <table class="table table-sm table-success table-hover mb-0">
+      <table class="table table-sm table-warning table-hover mb-0">
         <thead>
           <tr>
             <th scope="col">Account</th>

@@ -4,8 +4,10 @@ import { useToast } from 'vue-toastification'
 import { Wallet } from '../lib/near-wallet';
 import { SmartCity } from '../lib/near-interface';
 
-export const wallet = new Wallet({ createAccessKeyFor: process.env.CONTRACT_NAME });
-export const contract = new SmartCity({ contractId: process.env.CONTRACT_NAME, walletToUse: wallet });
+const CONTRACT_NAME = "dev-1664289608809-71577605147570";
+
+export const wallet = new Wallet({ createAccessKeyFor: CONTRACT_NAME });
+export const contract = new SmartCity({ contractId: CONTRACT_NAME, walletToUse: wallet });
 
 const toast = useToast();
 
