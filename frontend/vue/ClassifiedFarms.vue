@@ -1,6 +1,6 @@
 <template>
   <section class="row">
-    <article v-for="(farms, farmSize) in classifiedFarms" :key="farmSize" class="col-lg-4">
+    <article v-for="(farms, farmSize) in classifiedFarms" :key="farmSize" class="col-md-4">
       <div class="card">
         <img :src="farmsInfoMapping[farmSize].img" class="card-img-top" :alt="farmSize + ' farm'" />
         <div class="card-body d-flex flex-column align-items-center">
