@@ -1,29 +1,32 @@
 <template>
-  <!-- No active session -->
-  <section v-if="!isLoggedIn" class="signed-out-flow">
-    <button @click="login" id="sign-in-button">Sign in with NEAR Wallet</button>
-  </section>
   <!-- Active session -->
-  <section v-else class="signed-in-flow">
-
-    <button id="sign-out-button" @click="logout">
-      Sign out <span>{{accountId}}</span>
-    </button>
+  <section v-if="isLoggedIn" class="signed-in-flow">
 
     <section data-behavior="dashboard">
-      <h3>{{tokensBalanceText}}</h3>
+      <h4>{{tokensBalanceText}}</h4>
 
-      <h4 v-if="accountInfo != null">
-        Total power rate of your farms: {{accountInfo.totalPowerRate}} KWh
-      </h4>
+      <ul v-if="accountInfo != null">
+        <li>
+          Total capacity your farms: <strong>{{accountInfo.totalPowerRate}} KWh</strong>
+        </li>
+        <li>
+          Last withdrawal: {{lastWithdrawal}}
+        </li>
+      </ul>
 
-      <p>Last withdrawal: {{lastWithdrawal}}</p>
+      <div class="d-flex">
+        <button
+          class="w-50 me-1 btn btn-primary"
+          :disabled="disabledWithdrawButton"
+          @click="withdraw"
+        >{{withdrawButtonText}}</button>
+        <button
+          class="w-50 ms-1 btn btn-success"
+          :disabled="disabledRedeemButton"
+          @click="redeem"
+        >{{redeemButtonText}}</button>
+      </div>
 
-      <button v-if="KWhGenerated > 0" @click="withdraw">Withdraw {{KWhGenerated}} tokens</button>
-      <p v-else>0 tokens to withdraw</p>
-
-      <button v-if="NearValue > 0" @click="redeem">Redeem {{NearValue}} NEAR</button>
-      <p v-else>0 tokens to redeem</p>
     </section>
   </section>
 </template>
@@ -38,6 +41,7 @@
   export default {
     data() {
       return {
+        loading: false,
         farmsInfoMapping: {
           small: {
             panels: 80,
@@ -59,9 +63,6 @@
     },
     computed: {
       ...mapState(useMainStore, ["isLoggedIn", "accountInfo", "tokensBalance"]),
-      accountId() {
-        return wallet.accountId;
-      },
       classifiedFarms() {
         const data = this.accountInfo;
         if (data == null) {
@@ -106,8 +107,20 @@
 
         return hours * data.totalPowerRate;
       },
+      withdrawButtonText() {
+        if (this.KWhGenerated > 0) {
+          return `Withdraw ${this.KWhGenerated} tokens`;
+        }
+        return "0 tokens to withdraw";
+      },
       NearValue() {
         return Number((this.tokensBalance * NEAR_KWH_RATE).toFixed(2));
+      },
+      redeemButtonText() {
+        if (this.NearValue > 0) {
+          return `Redeem ${this.NearValue} NEAR`;
+        }
+        return "0 tokens to redeem";
       },
       tokensBalanceText() {
         const tokens = this.tokensBalance;
@@ -116,28 +129,32 @@
           NearValue = `, equivalent to ${this.NearValue} NEAR`;
         }
         return `${tokens} tokens (KWh) in your wallet${NearValue}`;
+      },
+      disabledWithdrawButton() {
+        return (!(this.KWhGenerated > 0) || this.loading)
+      },
+      disabledRedeemButton() {
+        return (!(this.NearValue > 0) || this.loading)
       }
     },
     methods: {
       ...mapActions(useMainStore, ["refresh"]),
-      login() {
-        wallet.signIn();
-      },
-      logout() {
-        wallet.signOut();
-      },
       async withdraw() {
         try {
+          this.loading = true;
           await contract.withdraw();
-          this.refresh();
+          await this.refresh();
+          this.loading = false;
         } catch(err) {
           console.error("Error while withdrawing", err);
         }
       },
       async redeem() {
         try {
+          this.loading = true;
           await contract.redeem();
-          this.refresh();
+          await this.refresh();
+          this.loading = false;
         } catch(err) {
           console.error("Error while redeeming", err);
         }

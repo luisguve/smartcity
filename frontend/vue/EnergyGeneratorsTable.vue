@@ -1,22 +1,24 @@
 <template>
-  <h3 v-if="energyGenerators.length == 0">There are still no farms</h3>
+  <h4 v-if="energyGenerators.length == 0">There are still no farms</h4>
   <template v-else>
-    <h3>{{solarFarmsCountText}}</h3>
-    <table>
-      <tr>
-        <th>Account</th>
-        <th>Farms</th>
-        <th>Total Power Rate</th>
-        <th>Last withdrawal</th>
-        <th>KWh generated</th>
-      </tr>
-      <tr v-for="element in tableRows">
-        <td>{{element.accountId}}</td>
-        <td>{{element.farms}}</td>
-        <td>{{element.totalPowerRate}}</td>
-        <td>{{element.lastWithdrawal}}</td>
-        <td>{{element.KWhGenerated}}</td>
-      </tr>
+    <h4 class="text-center">{{solarFarmsCountText}}</h4>
+    <table class="table table-sm table-success table-hover">
+      <thead>
+        <tr>
+          <th scope="col">Account</th>
+          <th scope="col">Farms</th>
+          <th scope="col">Capacity</th>
+          <th scope="col">KWh generated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="element in tableRows">
+          <th scope="row">{{element.accountId}}</th>
+          <td>{{element.farms}}</td>
+          <td>{{element.totalPowerRate}} KWh</td>
+          <td>{{element.KWhGenerated}}</td>
+        </tr>
+      </tbody>
     </table>
   </template>
 </template>

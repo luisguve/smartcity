@@ -1,16 +1,34 @@
 <template>
-  <article v-for="(farms, farmSize) in classifiedFarms" :key="farmSize">
-    <h4>{{farmSize}}: {{farmsInfoMapping[farmSize].powerRate}} KWh</h4>
-    <h6 v-if="isLoggedIn">{{farms.length}} {{(farms.length !== 1) ? "farms" : "farm"}}</h6>
-    <p v-if="farms.length > 0">
-      Total power rate: {{farms.length * farmsInfoMapping[farmSize].powerRate}} KWh
-    </p>
-    <strong>Price: {{farmsInfoMapping[farmSize].price}} NEAR</strong>
-    <button
-      :disabled="!isLoggedIn"
-      @click="buyFarm(farmSize)"
-    >{{ isLoggedIn ? "Buy farm" : "Signin to buy" }}</button>
-  </article>
+  <section class="row">
+    <article v-for="(farms, farmSize) in classifiedFarms" :key="farmSize" class="col-lg-4">
+      <div class="card">
+        <div class="card-body d-flex flex-column align-items-center">
+          <h5 class="card-title">{{farmSize}} farm</h5>
+
+          <ul>
+            <li>
+              Power rate: {{farmsInfoMapping[farmSize].powerRate}} KWh
+            </li>
+            <li v-if="isLoggedIn">
+              You have: {{farms.length}} {{(farms.length !== 1) ? "farms" : "farm"}}
+            </li>
+            <li v-if="isLoggedIn">
+              Total power rate: {{farms.length * farmsInfoMapping[farmSize].powerRate}} KWh
+            </li>
+            <li>
+              Price: {{farmsInfoMapping[farmSize].price}} NEAR
+            </li>
+          </ul>
+
+          <button
+            class="btn btn-success"
+            :disabled="!isLoggedIn"
+            @click="buyFarm(farmSize)"
+          >{{ isLoggedIn ? "Buy farm" : "Signin to buy" }}</button>
+        </div>
+      </div>
+    </article>
+  </section>
 </template>
 
 <script>
