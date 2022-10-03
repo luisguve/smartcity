@@ -151,7 +151,7 @@
         try {
           this.loading = true;
           await contract.withdraw();
-          this.toast.success(`${tokens} tokens withdrawn to your wallet`);
+          this.toast.success(`${tokens} tokens sent to your wallet`);
           await this.refresh();
           this.loading = false;
         } catch(err) {
@@ -164,7 +164,7 @@
         try {
           this.loading = true;
           await contract.redeem();
-          this.toast.success(`${value} NEAR redeemed to your wallet`);
+          this.toast.success(`${value} NEAR transferred to your wallet`);
           await this.refresh();
           this.loading = false;
         } catch(err) {

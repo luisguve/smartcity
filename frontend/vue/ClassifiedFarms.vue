@@ -2,6 +2,7 @@
   <section class="row">
     <article v-for="(farms, farmSize) in classifiedFarms" :key="farmSize" class="col-lg-4">
       <div class="card">
+        <img :src="farmsInfoMapping[farmSize].img" class="card-img-top" :alt="farmSize + ' farm'" />
         <div class="card-body d-flex flex-column align-items-center">
           <h5 class="card-title">{{farmSize}} farm</h5>
 
@@ -34,6 +35,10 @@
 <script>
   import { mapState, mapActions } from "pinia";
   import { useMainStore, contract } from "../store";
+  import SmallFarmImg from "../assets/small-farm.jpg";
+  import MediumFarmImg from "../assets/medium-farm.jpg";
+  import SmallFarmImg from "../assets/small-farm.jpg";
+  import BigFarmImg from "../assets/big-farm.jpg";
 
   export default {
     data() {
@@ -42,17 +47,20 @@
           small: {
             panels: 80,
             powerRate: 160,
-            price: 100
+            price: 100,
+            img: SmallFarmImg
           },
           medium: {
             panels: 140,
             powerRate: 280,
-            price: 160
+            price: 160,
+            img: MediumFarmImg
           },
           big: {
             panels: 210,
             powerRate: 420,
-            price: 250
+            price: 250,
+            img: BigFarmImg
           }
         }
       };
@@ -78,7 +86,7 @@
         try {
           await contract.buySolarFarm(farmSize, this.farmsInfoMapping[farmSize].price);
         } catch(err) {
-          console.error("Error while buy farm", err);
+          console.error("Error while buying farm", err);
         }
       }
     }
