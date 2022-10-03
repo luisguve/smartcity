@@ -33,6 +33,7 @@
 
 <script>
   import { mapState, mapActions } from "pinia";
+  import { useToast } from "vue-toastification";
 
   import { useMainStore, wallet, contract } from "../store";
 
@@ -40,7 +41,9 @@
 
   export default {
     data() {
+      const toast = useToast();
       return {
+        toast,
         loading: false,
         farmsInfoMapping: {
           small: {
@@ -62,7 +65,8 @@
       };
     },
     computed: {
-      ...mapState(useMainStore, ["isLoggedIn", "accountInfo", "tokensBalance"]),
+      ...mapState(useMainStore,
+        ["isLoggedIn", "accountInfo", "loadingAccountInfo", "tokensBalance", "loadingTokensBalance"]),
       classifiedFarms() {
         const data = this.accountInfo;
         if (data == null) {
@@ -79,7 +83,7 @@
           return null;
         }
         const lastWithdrawalDate = new Date(data.lastWithdrawal * 1000).toLocaleString();
-        const diffSeconds = Math.floor(Date.now() / 1000) - data.lastWithdrawal;
+        const diffSeconds = this.timestamp() - data.lastWithdrawal;
 
         const hours = Math.floor(diffSeconds / 3600);
         const days = Math.floor(hours / 24);
@@ -102,7 +106,7 @@
         if (data == null) {
           return 0;
         }
-        const diffSeconds = Math.floor(Date.now() / 1000) - data.lastWithdrawal;
+        const diffSeconds = this.timestamp() - data.lastWithdrawal;
         const hours = Math.floor(diffSeconds / 3600);
 
         return hours * data.totalPowerRate;
@@ -123,6 +127,9 @@
         return "0 tokens to redeem";
       },
       tokensBalanceText() {
+        if (this.loadingTokensBalance) {
+          return "Loading data";
+        }
         const tokens = this.tokensBalance;
         let NearValue = ""
         if (tokens > 0) {
@@ -140,24 +147,33 @@
     methods: {
       ...mapActions(useMainStore, ["refresh"]),
       async withdraw() {
+        const tokens = this.KWhGenerated;
         try {
           this.loading = true;
           await contract.withdraw();
+          this.toast.success(`${tokens} tokens withdrawn to your wallet`);
           await this.refresh();
           this.loading = false;
         } catch(err) {
+          this.toast.error("Could not witdraw tokens");
           console.error("Error while withdrawing", err);
         }
       },
       async redeem() {
+        const value = this.NearValue;
         try {
           this.loading = true;
           await contract.redeem();
+          this.toast.success(`${value} NEAR redeemed to your wallet`);
           await this.refresh();
           this.loading = false;
         } catch(err) {
+          this.toast.error("Could not redeem NEAR");
           console.error("Error while redeeming", err);
         }
+      },
+      timestamp() {
+        return (Math.floor(Date.now() / 1000) + 60); // add 1 minute
       }
     }
   };

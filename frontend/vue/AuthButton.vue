@@ -4,7 +4,7 @@
     <button @click="login" class="btn btn-primary">Sign in with NEAR Wallet</button>
   </section>
   <!-- Active session -->
-  <button v-else @click="logout" :style="logoutButtonStyle" class="btn btn-secondary">
+  <button v-else @click="logout" class="logout btn btn-secondary">
     Sign out <span>{{accountId}}</span>
   </button>
 </template>
@@ -16,13 +16,7 @@
 
   export default {
     data() {
-      return {
-        logoutButtonStyle: {
-          position: "absolute",
-          bottom: "40px",
-          right: "40px"
-        }
-      };
+      return {};
     },
     computed: {
       ...mapState(useMainStore, ["isLoggedIn"]),
@@ -40,3 +34,17 @@
     }
   };
 </script>
+
+<style scoped>
+  button.logout {
+    position: absolute;
+    bottom: 40px;
+    right: 40px;
+    z-index: 10;
+  }
+  @media screen and (max-width: 768px) {
+    button.logout {
+      position: initial;
+    }
+  }
+</style>
